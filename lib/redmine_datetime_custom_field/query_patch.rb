@@ -47,7 +47,7 @@ class Query < ActiveRecord::Base
       if Rails.env.test?
         time.strftime("%Y-%m-%d %H:%M:%S")
       else
-        time.strftime("%d/%m/%Y %H:%M") # Custom format
+        time.strftime("%d/%m/%Y %H:%M:%S") # Custom format
       end
     else
       self.class.connection.quoted_date(time)

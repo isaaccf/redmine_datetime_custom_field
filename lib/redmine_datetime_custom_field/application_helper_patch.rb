@@ -27,14 +27,14 @@ module RedmineDatetimeCustomField
     def calendar_for(field_id, showHours = nil)
       include_calendar_headers_tags
       javascript_tag("$(function() {" +
-                       (showHours ? "datetimepickerOptions.timepicker=true; datetimepickerOptions.format='d/m/Y H:i';" : "datetimepickerOptions.timepicker=false;datetimepickerOptions.format='d/m/Y';") +
+                       (showHours ? "datetimepickerOptions.timepicker=true; datetimepickerOptions.format='d/m/Y H:i:s';" : "datetimepickerOptions.timepicker=false;datetimepickerOptions.format='d/m/Y';") +
                        "datetimepickerCreate('##{field_id}');" +
                        "$('.custom_field_show_hours').click( function(){ " +
                        "if($('##{field_id}').val()=='') return;" +
                        "var asHours = $('##{field_id}').val().indexOf(':')!=-1;" +
                        "if($('#custom_field_show_hours_yes').prop('checked') && !asHours){ " +
                        "var dt = new Date();" +
-                       "$('##{field_id}').val($('##{field_id}').val()+' '+(dt.getHours()<10?'0':'')+dt.getHours()+':00');" +
+                       "$('##{field_id}').val($('##{field_id}').val()+' '+(dt.getHours()<10?'0':'')+dt.getHours()+':00');" +                       
                        "}else if($('#custom_field_show_hours_no').prop('checked') && asHours) { " +
                        "$('##{field_id}').val($('##{field_id}').val().substr(0,10));" +
                        "} });" +
@@ -61,7 +61,7 @@ module RedmineDatetimeCustomField
               "id:'datetimepicker'," +
               "onShow: function( currentDateTime ){" +
               "if( $('#custom_field_show_hours_yes').length==0 ) return;" +
-              "this.setOptions( { format: ( $('#custom_field_show_hours_yes').prop('checked') ? 'd/m/Y H:i' : 'd/m/Y' )," +
+              "this.setOptions( { format: ( $('#custom_field_show_hours_yes').prop('checked') ? 'd/m/Y H:i:s' : 'd/m/Y' )," +
               "timepicker: $('#custom_field_show_hours_yes').prop('checked') } );" +
               "} };" +
               "function datetimepickerCreate(id){" +
@@ -79,14 +79,24 @@ module RedmineDatetimeCustomField
       end
     end
 
+    #def format_time_without_zone(time, include_date = true)
+    #  return nil unless time
+    #  options = {}
+    #  options[:format] = (Setting.time_format.blank? ? :time : Setting.time_format)
+    #  time = time.to_time if time.is_a?(String)
+    #  (include_date ? "#{format_date(time)} " : "") + ::I18n.l(time, **options)
+    #end
     def format_time_without_zone(time, include_date = true)
       return nil unless time
       options = {}
       options[:format] = (Setting.time_format.blank? ? :time : Setting.time_format)
+      # Asegúrate de que incluya segundos
+      if options[:format] == :time
+        options[:format] = '%d/%m/%Y %H:%M:%S'  # Ajusta este formato para incluir los segundos
+      end
       time = time.to_time if time.is_a?(String)
       (include_date ? "#{format_date(time)} " : "") + ::I18n.l(time, **options)
     end
-
   end
 end
 ApplicationHelper.prepend RedmineDatetimeCustomField::ApplicationHelperPatch

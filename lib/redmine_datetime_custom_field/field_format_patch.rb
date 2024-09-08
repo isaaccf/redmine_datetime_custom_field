@@ -8,7 +8,7 @@ module RedmineDatetimeCustomField
     end
 
     def validate_single_value(custom_field, value, customized = nil)
-      if (((value =~ /^\d{4}-\d{2}-\d{2}$/ || value =~ /^\d{2}\/\d{2}\/\d{4}$/) && custom_field.show_hours != '1') || ((value =~ /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/ || value =~ /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/) && custom_field.show_hours == '1')) && (value.to_date rescue false)
+      if (((value =~ /^\d{4}-\d{2}-\d{2}$/ || value =~ /^\d{2}\/\d{2}\/\d{4}$/) && custom_field.show_hours != '1') || ((value =~ /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/ || value =~ /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/) && custom_field.show_hours == '1')) && (value.to_date rescue false)
         []
       else
         [::I18n.t('activerecord.errors.messages.not_a_date')]
@@ -16,7 +16,7 @@ module RedmineDatetimeCustomField
     end
 
     def edit_tag(view, tag_id, tag_name, custom_value, options = {})
-      edit_tag = view.text_field_tag(tag_name, custom_value.value, options.merge(:id => tag_id, :size => 15)) +
+      edit_tag = view.text_field_tag(tag_name, custom_value.value, options.merge(:id => tag_id, :size => 18)) +
         view.calendar_for(tag_id, custom_value.custom_field.show_hours == '1')
       edit_tag += view.link_to(::I18n.t(:now_label), '#',
                                onclick: "nowShortcut(this.dataset.cfId, " + custom_value.custom_field.show_hours + "); return false",
@@ -26,7 +26,7 @@ module RedmineDatetimeCustomField
     end
 
     def bulk_edit_tag(view, tag_id, tag_name, custom_field, objects, value, options = {})
-      view.text_field_tag(tag_name, value, options.merge(:id => tag_id, :size => 15)) +
+      view.text_field_tag(tag_name, value, options.merge(:id => tag_id, :size => 18)) +
         view.calendar_for(tag_id, custom_field.show_hours == '1') +
         bulk_clear_tag(view, tag_id, tag_name, custom_field, value)
     end
@@ -34,9 +34,9 @@ module RedmineDatetimeCustomField
     if !Rails.env.test?
       def order_statement(custom_field)
         if custom_field.class.connection.adapter_name.downcase.to_sym == :mysql2
-          Arel.sql "STR_TO_DATE(#{join_alias custom_field}.value, '%d/%m/%Y %H:%i')"
+          Arel.sql "STR_TO_DATE(#{join_alias custom_field}.value, '%d/%m/%Y %H:%i:%s')"
         else
-          Arel.sql "to_timestamp(#{join_alias custom_field}.value, 'DD/MM/YYYY HH24:MI')"
+          Arel.sql "to_timestamp(#{join_alias custom_field}.value, 'DD/MM/YYYY HH24:MI:SS')"
         end
       end
     end

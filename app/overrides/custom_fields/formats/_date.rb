@@ -7,7 +7,7 @@ Deface::Override.new :virtual_path => "custom_fields/formats/_date",
                      :replace => "p:first-child",
                      :text => <<-EOS
 <p>
-	<%= f.text_field(:default_value, :size => 15) %>
+	<%= f.text_field(:default_value, :size => 18) %>
 </p>
 <p>
 	<label><%=l(:field_hours)%></label>
